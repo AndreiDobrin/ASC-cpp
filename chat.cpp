@@ -5,7 +5,11 @@
 #include <iostream>
 using namespace std;
 #include <cstring>
+#include <fstream>
 
+ifstream fin("info.fin");
+
+int v[1024];
 void add(int &n, int v[]){
     int ok=0;
     int nr;
@@ -13,16 +17,22 @@ void add(int &n, int v[]){
     int k=0;
     int descr,dim;
     int i1=0,i2=0;
-        cin>>nr;
+        //numarul de fisiere
+        fin>>nr;
         while(nr>0){
-            cin>>descr;
-            cin>>dim;
-
-            for(k=0;k<dim/8+1;k++){
+            //descriptor
+            fin>>descr;
+            //dimensiunea
+            fin>>dim;
+            k=0;
+            if(dim%8==0) //daca se imparte exact, se compenseaza pentru ca in for am pus +1 pentru aproximare cu adaos
+                k=1;
+            while(k<dim/8+1){
                 v[i2++] = descr;
+                k++;
             }
             nr--;
-            cout<<descr<<": ("<<i1<<','<<i2-1<<")\n";
+            cout<<descr<<": ("<<i1<<", "<<i2-1<<")\n";
             i1=i2;
         }
 
@@ -31,35 +41,47 @@ void add(int &n, int v[]){
 
 void get(int &n, int v[]){
     int x,i=0;
-    int pos1,pos2;
-    cin>>x;
+    int pos1=0,pos2=0;
+    fin>>x;
     while(v[i]!=x && i<n)
         i++;
-    if(i==n)
-        cout<<"Nu exista acest fisier...\n";
-    else {
-        pos1 = i;
-        while(v[i]==x)
-            i++;
-        pos2 = i-1;
+
+    if(v[i]==x){
+    pos1 = i;
+    while(v[i]==x)
+        i++;
+    pos2 = i-1;
     }
-    cout<<'('<<pos1<<','<<pos2<<')'<<endl;
+    cout<<'('<<pos1<<", "<<pos2<<')'<<endl;
 }
+
 
 void del(int &n, int v[]){
     int x,i=0;
-    cin>>x;
+    fin>>x;
     while(v[i]!=x && i<n){
         i++;
     }
-    if(i==n)
-        cout<<"Nu exista acest fisier...\n";
-    else{
+    if(i!=n){
         while(v[i]==x)
             v[i++]=0;
-        
-    } 
-}
+    }
+    int pos1=0;
+    int pos2;
+    i=0;
+    while(i<n){
+        //if(v[i]!=0){
+            while(v[i]==v[i+1])
+                i++;
+            pos2=i;
+        if(v[i]!=0)
+            cout<<v[i]<<": ("<<pos1<<", "<<pos2<<")\n";
+        i++;;
+        pos2++;
+        pos1=pos2;
+    }
+    }
+
 
 void defrag(int &n, int v[]){
     int i = 0;
@@ -84,7 +106,7 @@ void defrag(int &n, int v[]){
                     i++;
                 pos2 = i;
                 j = pos2-pos1;
-                while(j>0){
+                while(j>=0){
                     aux=v[pos1];
                     v[pos1]=v[pos2];
                     v[pos2]=aux;
@@ -95,22 +117,38 @@ void defrag(int &n, int v[]){
             }
         }
         i++;
-    }  
+    }
+    pos1=0;
+    pos2;
+    i=0;
+    while(i<n){
+        //if(v[i]!=0){
+            while(v[i]==v[i+1])
+                i++;
+            pos2=i;
+        if(v[i]!=0)
+            cout<<v[i]<<": ("<<pos1<<", "<<pos2<<")\n";
+        i++;
+        pos2++;
+        pos1=pos2;
+    }
 }
 
 
 int main() {
     char s[30];
-    int v[10],n=10;
+    int n=1024;
+
     for(int i=0;i<10;i++)
     v[i]=0;
     int x,y;
     int inst;
     int i;
     int nr;
-    cin>>nr;
-    cin>>inst;
+    fin>>nr;
     while(nr>0){
+        cout<<endl;
+        fin>>inst;
         if(inst==1)
             add(n,v);
         
@@ -134,4 +172,6 @@ int main() {
      //   cout<<v[i]<<" ";
     //cout<<endl;
     }
+    fin.close();
+    return 0;
 }
